@@ -3,6 +3,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+// GenAi
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -38,6 +44,29 @@ app.delete('/items/:id', async (req, res) => {
   await Item.findByIdAndDelete(req.params.id);
   res.json({ message: 'Item deleted' });
 });
+
+app.get('/test', async (req, res) => {
+  items = ["Apples", "Butter"]
+  const aaa = await generateRecipe(items)
+  res.json(aaa);
+});
+
+async function generateText(prompt) {
+  const result = await model.generateContent(prompt);
+  return result;
+}
+
+
+
+async function generateRecipe(items){
+  itemString = "";
+  for(i = 0; i < items.length; i++){
+    itemString = itemString + items[i] + ", ";
+  }
+  
+  const response = await generateText("Using the following ingredients, generate a recipe with instructions. If you need any other basic cooking ingredients, you may use those as well, but make sure to use all of the ingredients listed. " + itemString);
+    return (response.response.text());
+}
 
 // Start Server
 const PORT = 6000;
