@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator, Button } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const API_URL = 'http:/localhost:6000/items'; // Use this for Android Emulator or localhost backend
+const API_URL = 'http://localhost:6000/items'; // Ensure the correct backend URL
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,11 +36,8 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Expiring Soon</Text>
-      
-      <Button title="Go to Next Page" onPress={() => navigation.navigate('Scan')} />
-
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#007AFF" />
       ) : (
         <FlatList
           data={items}
@@ -63,14 +60,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
   },
   item: {
     flexDirection: 'row',
