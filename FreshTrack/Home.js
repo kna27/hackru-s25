@@ -10,8 +10,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import styles from "./styles";
 import { useFocusEffect } from "@react-navigation/native";
-
-const API_URL = "http://localhost:6000/items";
+import API_URL from "./env";
 
 const HomeScreen = () => {
   const [items, setItems] = useState([]);
@@ -29,7 +28,7 @@ const HomeScreen = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(`${API_URL}/items`);
       const data = await response.json();
 
       const processedData = data.map((item) => ({

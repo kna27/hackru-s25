@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import Markdown from "react-native-markdown-display";
 import styles from './styles';
+import API_URL from "./env";
 
-const API_URL = "http://localhost:6000/getRecipe";
 
 const RecipeScreen = () => {
   const [recipeContent, setRecipeContent] = useState("");
@@ -21,7 +21,7 @@ const RecipeScreen = () => {
 
   const fetchRecipe = async () => {
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(`${API_URL}/getRecipe`);
       let data = await response.text();
       data = data.replace(/(?<!\*)\*(?!\*)/g, ""); 
       data = data.replace(/["]/g, ""); 

@@ -6,6 +6,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingTop: Platform.OS === 'android' ? 35 : 0,
   },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+  },
   container: {
     flex: 1,
     backgroundColor: '#ECFFDC',

@@ -1,20 +1,21 @@
 import React, { useState } from "react";
 import {
-  StyleSheet,
   Text,
   View,
   TouchableOpacity,
   Image,
   TextInput,
   ActivityIndicator,
+  ScrollView,
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import styles from './styles'; // Import the shared styles
+import styles from "./styles"; // Import the shared styles
 import { SafeAreaView } from "react-native-safe-area-context";
+import API_URL from "./env";
 
-const API_URL = "http://localhost:6000";
+
 
 const ScanScreen = () => {
   const [productImage, setProductImage] = useState(null);
@@ -26,12 +27,12 @@ const ScanScreen = () => {
 
   // Generalized image picker function.
   const pickImage = async (setImageFunction, endpoint, setTextFunction) => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
       Alert.alert("Media library permission denied");
       return;
     }
-    const result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchCameraAsync({
       base64: true,
     });
     if (!result.canceled) {
@@ -109,61 +110,65 @@ const ScanScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Add Item</Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => pickImage(setProductImage, "getName", setProductText)}
-        >
-          <Text style={styles.buttonText}>Product Image</Text>
-        </TouchableOpacity>
-        {productImage && (
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: productImage }} style={styles.image} />
-          </View>
-        )}
-        <TextInput
-          style={styles.textBox}
-          value={productText}
-          placeholder="Product Name"
-          editable={true}
-          onChangeText={setProductText}
-        />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Text style={styles.title}>Add Item</Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              pickImage(setProductImage, "getName", setProductText)
+            }
+          >
+            <Text style={styles.buttonText}>Product Image</Text>
+          </TouchableOpacity>
+          {productImage && (
+            <View style={styles.imageContainer}>
+              <Image source={{ uri: productImage }} style={styles.image} />
+            </View>
+          )}
+          <TextInput
+            style={styles.textBox}
+            value={productText}
+            placeholder="Product Name"
+            editable={true}
+            onChangeText={setProductText}
+          />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            pickImage(setExpirationImage, "getExpiration", setExpirationDate)
-          }
-        >
-          <Text style={styles.buttonText}>Expiration Date Image</Text>
-        </TouchableOpacity>
-        {expirationImage && (
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: expirationImage }} style={styles.image} />
-          </View>
-        )}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              pickImage(setExpirationImage, "getExpiration", setExpirationDate)
+            }
+          >
+            <Text style={styles.buttonText}>Expiration Date Image</Text>
+          </TouchableOpacity>
+          {expirationImage && (
+            <View style={styles.imageContainer}>
+              <Image source={{ uri: expirationImage }} style={styles.image} />
+            </View>
+          )}
 
-        <DateTimePicker
-          value={expirationDate}
-          mode={"date"}
-          is24Hour={true}
-          display="default"
-          style={styles.datePicker}
-          onChange={onExpirationDateChange}
-        />
+          <DateTimePicker
+            value={expirationDate}
+            mode={"date"}
+            is24Hour={true}
+            display="default"
+            style={styles.datePicker}
+            onChange={onExpirationDateChange}
+          />
 
-        {loading && <ActivityIndicator size="large" color="#007AFF" />}
-        {error && <Text style={styles.errorText}>{error}</Text>}
+          {loading && <ActivityIndicator size="large" color="#007AFF" />}
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={submitItem}
-          disabled={loading || !productText || !expirationDate}
-        >
-          <Text style={styles.buttonText}>Submit Item</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={submitItem}
+            disabled={loading || !productText || !expirationDate}
+          >
+            <Text style={styles.buttonText}>Submit Item</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
