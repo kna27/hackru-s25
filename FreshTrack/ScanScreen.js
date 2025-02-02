@@ -111,11 +111,12 @@ const ScanScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Add Item</Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => pickImage(setProductImage, "getName", setProductText)}
       >
-        <Text style={styles.buttonText}>Upload Product Image</Text>
+        <Text style={styles.buttonText}>Product Image</Text>
       </TouchableOpacity>
       {productImage && (
         <View style={styles.imageContainer}>
@@ -125,7 +126,7 @@ const ScanScreen = () => {
       <TextInput
         style={styles.textBox}
         value={productText}
-        placeholder="Product Details"
+        placeholder="Product Name"
         editable={true}
         onChangeText={setProductText}
       />
@@ -136,7 +137,7 @@ const ScanScreen = () => {
           pickImage(setExpirationImage, "getExpiration", setExpirationDate)
         }
       >
-        <Text style={styles.buttonText}>Upload Expiration Date Image</Text>
+        <Text style={styles.buttonText}>Expiration Date Image</Text>
       </TouchableOpacity>
       {expirationImage && (
         <View style={styles.imageContainer}>
@@ -172,6 +173,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   button: {
     backgroundColor: "#007AFF",
