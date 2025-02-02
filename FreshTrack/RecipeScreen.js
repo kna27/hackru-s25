@@ -32,6 +32,7 @@ const RecipeScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Recipe Suggestion</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
