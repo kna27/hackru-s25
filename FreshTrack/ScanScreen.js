@@ -61,6 +61,7 @@ const ScanScreen = () => {
       if (endpoint === "getExpiration") {
         const date = new Date(data.text);
         if (date instanceof Date && !isNaN(date)) {
+          date.setDate(date.getDate() + 1);
           setExpirationDate(date);
         }
       } else {
@@ -89,6 +90,9 @@ const ScanScreen = () => {
       });
 
       Alert.alert("Item Saved!");
+      setProductText("");
+      setProductImage(null);
+      setExpirationImage(null);
     } catch (err) {
       console.error(err);
       setError("Failed to submit item");
