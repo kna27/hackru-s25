@@ -1,11 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const multer = require("multer");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 
 // GenAi
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-
+const { GoogleAIFileManager } = require("@google/generative-ai/server");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API);
 const fileManager = new GoogleAIFileManager(process.env.GEMINI_API);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -68,54 +71,89 @@ async function getExpiringIn(days) {
   return await Item.find({ expiration: { $lte: future } });
 }
 
-async function getExpiration(imageURL){
-  const uploadResult = await fileManager.uploadFile(
-    imageURL,
-    {
-      mimeType: "image/jpeg",
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+const saveBufferToFile = (buffer, fileName) => {
+  const tempFilePath = path.join(__dirname, "uploads", fileName);
+  fs.writeFileSync(tempFilePath, buffer);
+  return tempFilePath;
+};
+
+app.post("/getExpiration", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file || !req.file.buffer) return res.status(400).json({ error: "No file uploaded" });
+
+    // Save buffer to temporary file
+    const tempFilePath = saveBufferToFile(req.file.buffer, "expiration.jpg");
+
+    // Upload to Google AI
+    const uploadResult = await fileManager.uploadFile(tempFilePath, {
+      mimeType: req.file.mimetype,
       displayName: "Expiration Image",
-    },
-  );
+    });
 
-  console.log(
-    `Uploaded file ${uploadResult.file.displayName} as: ${uploadResult.file.uri}`,
-  );
+    console.log(`Uploaded file as: ${uploadResult.file.uri}`);
 
-  const result = await model.generateContent([
-    "What is the expiration date as seen in the image. Be careful, as the expiration date on the image may not be in standard mm/dd/yyyy format. Assume that the product has been purchaseed recently. In your response, only put the correct expiration date in the following format: yyyy-mm-dd",
-    {
-      fileData: {
-        fileUri: uploadResult.file.uri,
-        mimeType: uploadResult.file.mimeType,
+    // Generate expiration date
+    const result = await model.generateContent([
+      "What is the expiration date in this image? Return only the date in yyyy-mm-dd format. Assume that the product has been purchased recently.",
+      {
+        fileData: {
+          fileUri: uploadResult.file.uri,
+          mimeType: uploadResult.file.mimeType,
+        },
       },
-    },
-  ]);
-}
+    ]);
 
-async function getName(imageURL){
-  const uploadResult = await fileManager.uploadFile(
-    imageURL,
-    {
-      mimeType: "image/jpeg",
+    // Delete temporary file
+    fs.unlinkSync(tempFilePath);
+
+    res.json({ text: result.response.text() });
+  } catch (error) {
+    console.error("❌ Error processing image:", error);
+    res.status(500).json({ error: "Failed to process image" });
+  }
+});
+
+/**
+ * Uploads an image and extracts the product name.
+ */
+app.post("/getName", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file || !req.file.buffer) return res.status(400).json({ error: "No file uploaded" });
+
+    // Save buffer to temporary file
+    const tempFilePath = saveBufferToFile(req.file.buffer, "product.jpg");
+
+    // Upload to Google AI
+    const uploadResult = await fileManager.uploadFile(tempFilePath, {
+      mimeType: req.file.mimetype,
       displayName: "Product Image",
-    },
-  );
+    });
 
-  console.log(
-    `Uploaded file ${uploadResult.file.displayName} as: ${uploadResult.file.uri}`,
-  );
+    console.log(`Uploaded file as: ${uploadResult.file.uri}`);
 
-  const result = await model.generateContent([
-    "What is the name of the product in the uploaded file. Only return the name of the product as seen in the image. Write the name of the brand if visible as well. ",
-    {
-      fileData: {
-        fileUri: uploadResult.file.uri,
-        mimeType: uploadResult.file.mimeType,
+    // Generate product name
+    const result = await model.generateContent([
+      "What is the name of the product in the uploaded file? Only return the name of the product, including the brand if visible.",
+      {
+        fileData: {
+          fileUri: uploadResult.file.uri,
+          mimeType: uploadResult.file.mimeType,
+        },
       },
-    },
-  ]);
-}
+    ]);
 
+    // Delete temporary file
+    fs.unlinkSync(tempFilePath);
+
+    res.json({ text: result.response.text() });
+  } catch (error) {
+    console.error("❌ Error processing image:", error);
+    res.status(500).json({ error: "Failed to process image" });
+  }
+});
 
 async function generateRecipe(items){
   itemString = "";
