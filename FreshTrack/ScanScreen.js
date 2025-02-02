@@ -115,7 +115,7 @@ const ScanScreen = () => {
           style={styles.button}
           onPress={() => pickImage(setProductImage, "getName", setProductText)}
         >
-          <Text style={styles.buttonText}>+ Upload Image</Text>
+          <Text style={styles.buttonText}>Product Image</Text>
         </TouchableOpacity>
         {productImage && (
           <View style={styles.imageContainer}>
@@ -136,7 +136,7 @@ const ScanScreen = () => {
             pickImage(setExpirationImage, "getExpiration", setExpirationDate)
           }
         >
-          <Text style={styles.buttonText}>+ Upload Expiration Date Image</Text>
+          <Text style={styles.buttonText}>Expiration Date Image</Text>
         </TouchableOpacity>
         {expirationImage && (
           <View style={styles.imageContainer}>
@@ -161,7 +161,7 @@ const ScanScreen = () => {
           onPress={submitItem}
           disabled={loading || !productText || !expirationDate}
         >
-          <Text style={styles.buttonText}>Submit Item ✅</Text>
+          <Text style={styles.buttonText}>Submit Item</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -67,7 +67,8 @@ const HomeScreen = () => {
   };
 
   const getItemStyle = (daysRemaining) => {
-    if (daysRemaining < 3) return styles.item3;
+    if (daysRemaining < 1) return styles.item4;
+    else if (daysRemaining < 3) return styles.item3;
     else if (daysRemaining < 6) return styles.item2;
     return styles.item1;
   };
@@ -88,7 +89,7 @@ const HomeScreen = () => {
                   <Text style={styles.itemName}>{item.name}</Text>
                   <Text style={styles.itemDays}>
                     {
-                        item.daysRemaining === 0
+                        item.daysRemaining < 1
                         ? "Expired"
                         : item.daysRemaining === 1
                         ? "Expires today!"

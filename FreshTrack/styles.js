@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ECFFDC',
     paddingHorizontal: 30,
     paddingTop: 25,
+    marginBottom: 0,
   },
   title: {
     fontSize: 28,
@@ -64,6 +65,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     transform: [{ scale: 1.05 }],
   },
+  item4: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#E5AA70',
+    padding: 20,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 8,
+    marginBottom: 20,
+    transform: [{ scale: 1.05 }],
+  },
   itemInfo: {
     flex: 1,
     paddingLeft: 15,
@@ -83,7 +98,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   button: {
-    backgroundColor: "#77eda6",
+    backgroundColor: "#A5D6A7",
     paddingVertical: 12,
     paddingHorizontal: 4,
     borderRadius: 10,
@@ -98,7 +113,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
 },
 buttonText: {
-    color: "#000000",
+    color: "#2C6B28",
     fontSize: 18,
     fontWeight: "600",
     textAlign: "center",
