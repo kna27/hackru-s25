@@ -85,11 +85,7 @@ const ScanScreen = () => {
         }),
       });
 
-      const data = await response.json();
-      Alert.alert(
-        "Item Saved",
-        `Name: ${data.name}, Expiration: ${data.expiration}`
-      );
+      Alert.alert("Item Saved!");
     } catch (err) {
       console.error(err);
       setError("Failed to submit item");
@@ -150,6 +146,7 @@ const ScanScreen = () => {
         mode={"date"}
         is24Hour={true}
         display="default"
+        style={{ paddingHorizontal: 20 }}
         onChange={onExpirationDateChange}
       />
 
@@ -176,9 +173,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2E7D32',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "#2E7D32",
+    textAlign: "center",
     marginBottom: 20,
   },
   button: {
