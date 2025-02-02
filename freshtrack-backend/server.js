@@ -59,6 +59,22 @@ app.get("/getRecipe", async (req, res) => {
   res.json(aaa);
 });
 
+app.get("/getImage", async (req, res) => {
+  try {
+    // Get the recipe from the query parameter or body
+    const { recipe } = req.query; // Assuming recipe is passed as a query parameter
+    if (!recipe) {
+      return res.status(400).json({ error: "Recipe is required" });
+    }
+    // Generate the image based on the recipe
+    const image = await generateImage(recipe);
+    res.json({ image });
+  } catch (error) {
+    console.error("Error generating image:", error);
+    res.status(500).json({ error: "Error generating image" });
+  }
+});
+
 async function generateText(prompt) {
   const result = await model.generateContent(prompt);
   return result;
