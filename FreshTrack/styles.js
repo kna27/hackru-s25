@@ -8,8 +8,6 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
   },
   container: {
     flex: 1,

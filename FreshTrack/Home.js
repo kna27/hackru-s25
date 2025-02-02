@@ -58,7 +58,7 @@ const HomeScreen = () => {
 
   const deleteItem = async (id) => {
     try {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/items/${id}`, { method: "DELETE" });
       setItems(items.filter((item) => item._id !== id));
     } catch (error) {
       console.error("❌ Error deleting item:", error);
