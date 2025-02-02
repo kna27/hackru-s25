@@ -10,6 +10,7 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const API_URL = "http://localhost:6000";
 
@@ -17,7 +18,7 @@ const ScanScreen = () => {
   const [productImage, setProductImage] = useState(null);
   const [expirationImage, setExpirationImage] = useState(null);
   const [productText, setProductText] = useState("");
-  const [expirationText, setExpirationText] = useState("");
+  const [expirationDate, setExpirationDate] = useState(new Date());
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -54,7 +55,14 @@ const ScanScreen = () => {
       });
 
       const data = await response.json();
-      setTextFunction(data.text || "No text detected");
+      if (endpoint === "getExpiration") {
+        const date = new Date(data.text);
+        if (date instanceof Date && !isNaN(date)) {
+          setExpirationDate(date);
+        }
+      } else {
+        setTextFunction(data.text || "No text detected");
+      }
     } catch (err) {
       console.error(err);
       setError("Failed to upload image");
@@ -73,17 +81,31 @@ const ScanScreen = () => {
         },
         body: JSON.stringify({
           name: productText,
-          expiration: expirationText,
+          expiration: expirationDate.toISOString().split("T")[0], // Format the date as yyyy-mm-dd
         }),
       });
 
       const data = await response.json();
-      Alert.alert("Item Saved", `Name: ${data.name}, Expiration: ${data.expiration}`);
+      Alert.alert(
+        "Item Saved",
+        `Name: ${data.name}, Expiration: ${data.expiration}`
+      );
     } catch (err) {
       console.error(err);
       setError("Failed to submit item");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onExpirationDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || expirationDate;
+
+    // Check if the selected date is valid
+    if (currentDate instanceof Date && !isNaN(currentDate.getTime())) {
+      setExpirationDate(currentDate); // Update the state with valid date
+    } else {
+      console.log("Invalid date selected. Not updating expiration date.");
     }
   };
 
@@ -110,7 +132,9 @@ const ScanScreen = () => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => pickImage(setExpirationImage, "getExpiration", setExpirationText)}
+        onPress={() =>
+          pickImage(setExpirationImage, "getExpiration", setExpirationDate)
+        }
       >
         <Text style={styles.buttonText}>Upload Expiration Date Image</Text>
       </TouchableOpacity>
@@ -119,12 +143,13 @@ const ScanScreen = () => {
           <Image source={{ uri: expirationImage }} style={styles.image} />
         </View>
       )}
-      <TextInput
-        style={styles.textBox}
-        value={expirationText}
-        placeholder="Expiration Date"
-        editable={true}
-        onChangeText={setExpirationText}
+
+      <DateTimePicker
+        value={expirationDate}
+        mode={"date"}
+        is24Hour={true}
+        display="default"
+        onChange={onExpirationDateChange}
       />
 
       {loading && <ActivityIndicator size="large" color="#007AFF" />}
@@ -133,7 +158,7 @@ const ScanScreen = () => {
       <TouchableOpacity
         style={styles.submitButton}
         onPress={submitItem}
-        disabled={loading || !productText || !expirationText}
+        disabled={loading || !productText || !expirationDate}
       >
         <Text style={styles.buttonText}>Submit Item</Text>
       </TouchableOpacity>
