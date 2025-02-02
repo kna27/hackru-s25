@@ -87,9 +87,13 @@ const HomeScreen = () => {
                 <View style={styles.itemInfo}>
                   <Text style={styles.itemName}>{item.name}</Text>
                   <Text style={styles.itemDays}>
-                    {item.daysRemaining === 0
-                      ? "Expired"
-                      : `Expires in ${item.daysRemaining} days`}
+                    {
+                        item.daysRemaining === 0
+                        ? "Expired"
+                        : item.daysRemaining === 1
+                        ? "Expires today!"
+                        : `Expires in ${item.daysRemaining} days`
+                    }
                   </Text>
                 </View>
                 <TouchableOpacity onPress={() => deleteItem(item._id)}>

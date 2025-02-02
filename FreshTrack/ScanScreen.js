@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import styles from './styles'; // Import the shared styles
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const API_URL = "http://localhost:6000";
 
@@ -106,123 +108,64 @@ const ScanScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Add Item</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => pickImage(setProductImage, "getName", setProductText)}
-      >
-        <Text style={styles.buttonText}>Product Image</Text>
-      </TouchableOpacity>
-      {productImage && (
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: productImage }} style={styles.image} />
-        </View>
-      )}
-      <TextInput
-        style={styles.textBox}
-        value={productText}
-        placeholder="Product Name"
-        editable={true}
-        onChangeText={setProductText}
-      />
+    <SafeAreaView style={styles.safeContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Add Item</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => pickImage(setProductImage, "getName", setProductText)}
+        >
+          <Text style={styles.buttonText}>+ Upload Image</Text>
+        </TouchableOpacity>
+        {productImage && (
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: productImage }} style={styles.image} />
+          </View>
+        )}
+        <TextInput
+          style={styles.textBox}
+          value={productText}
+          placeholder="Product Name"
+          editable={true}
+          onChangeText={setProductText}
+        />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          pickImage(setExpirationImage, "getExpiration", setExpirationDate)
-        }
-      >
-        <Text style={styles.buttonText}>Expiration Date Image</Text>
-      </TouchableOpacity>
-      {expirationImage && (
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: expirationImage }} style={styles.image} />
-        </View>
-      )}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            pickImage(setExpirationImage, "getExpiration", setExpirationDate)
+          }
+        >
+          <Text style={styles.buttonText}>+ Upload Expiration Date Image</Text>
+        </TouchableOpacity>
+        {expirationImage && (
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: expirationImage }} style={styles.image} />
+          </View>
+        )}
 
-      <DateTimePicker
-        value={expirationDate}
-        mode={"date"}
-        is24Hour={true}
-        display="default"
-        style={{ paddingHorizontal: 20 }}
-        onChange={onExpirationDateChange}
-      />
+        <DateTimePicker
+          value={expirationDate}
+          mode={"date"}
+          is24Hour={true}
+          display="default"
+          style={styles.datePicker}
+          onChange={onExpirationDateChange}
+        />
 
-      {loading && <ActivityIndicator size="large" color="#007AFF" />}
-      {error && <Text style={styles.errorText}>{error}</Text>}
+        {loading && <ActivityIndicator size="large" color="#007AFF" />}
+        {error && <Text style={styles.errorText}>{error}</Text>}
 
-      <TouchableOpacity
-        style={styles.submitButton}
-        onPress={submitItem}
-        disabled={loading || !productText || !expirationDate}
-      >
-        <Text style={styles.buttonText}>Submit Item</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={submitItem}
+          disabled={loading || !productText || !expirationDate}
+        >
+          <Text style={styles.buttonText}>Submit Item ✅</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2E7D32",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 16,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  submitButton: {
-    backgroundColor: "#34C759",
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 20,
-  },
-  imageContainer: {
-    borderRadius: 8,
-    marginBottom: 16,
-    alignItems: "center",
-  },
-  image: {
-    width: 200,
-    height: 200,
-    borderRadius: 8,
-  },
-  textBox: {
-    width: "80%",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    marginTop: 10,
-    textAlign: "center",
-  },
-  errorText: {
-    color: "red",
-    marginTop: 16,
-  },
-});
 
 export default ScanScreen;
