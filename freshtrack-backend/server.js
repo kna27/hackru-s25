@@ -59,22 +59,6 @@ app.get("/getRecipe", async (req, res) => {
   res.json(aaa);
 });
 
-app.get("/getImage", async (req, res) => {
-  try {
-    // Get the recipe from the query parameter or body
-    const { recipe } = req.query; // Assuming recipe is passed as a query parameter
-    if (!recipe) {
-      return res.status(400).json({ error: "Recipe is required" });
-    }
-    // Generate the image based on the recipe
-    const image = await generateImage(recipe);
-    res.json({ image });
-  } catch (error) {
-    console.error("Error generating image:", error);
-    res.status(500).json({ error: "Error generating image" });
-  }
-});
-
 async function generateText(prompt) {
   const result = await model.generateContent(prompt);
   return result;
@@ -98,7 +82,8 @@ const saveBufferToFile = (buffer, fileName) => {
 
 app.post("/getExpiration", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file || !req.file.buffer) return res.status(400).json({ error: "No file uploaded" });
+    if (!req.file || !req.file.buffer)
+      return res.status(400).json({ error: "No file uploaded" });
 
     // Save buffer to temporary file
     const tempFilePath = saveBufferToFile(req.file.buffer, "expiration.jpg");
@@ -137,7 +122,8 @@ app.post("/getExpiration", upload.single("image"), async (req, res) => {
  */
 app.post("/getName", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file || !req.file.buffer) return res.status(400).json({ error: "No file uploaded" });
+    if (!req.file || !req.file.buffer)
+      return res.status(400).json({ error: "No file uploaded" });
 
     // Save buffer to temporary file
     const tempFilePath = saveBufferToFile(req.file.buffer, "product.jpg");
@@ -171,7 +157,7 @@ app.post("/getName", upload.single("image"), async (req, res) => {
   }
 });
 
-async function generateRecipe(items){
+async function generateRecipe(items) {
   itemString = "";
   for (i = 0; i < items.length; i++) {
     itemString = itemString + items[i] + ", ";
@@ -183,22 +169,6 @@ async function generateRecipe(items){
   );
   return response.response.text();
 }
-
-async function generateImage(recipe){
-  response = client.models.generate_image(
-    model='imagen-3.0-generate-002',
-    prompt="Generate an image of the food named in the following recipe: " + recipe,
-    config=types.GenerateImageConfig(
-        negative_prompt= 'people',
-        number_of_images= 1,
-        include_rai_reason= True,
-        output_mime_type= 'image/jpeg'
-    )
-)
-  return response.generated_images[0].image;
-}
-
-
 
 // Start Server
 const PORT = 6000;
