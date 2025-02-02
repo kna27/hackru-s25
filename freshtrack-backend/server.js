@@ -5,6 +5,7 @@ const cors = require("cors");
 
 // GenAi
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API);
 const fileManager = new GoogleAIFileManager(process.env.GEMINI_API);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -128,6 +129,22 @@ async function generateRecipe(items){
   );
   return response.response.text();
 }
+
+async function generateImage(recipe){
+  response = client.models.generate_image(
+    model='imagen-3.0-generate-002',
+    prompt="Generate an image of the food named in the following recipe: " + recipe,
+    config=types.GenerateImageConfig(
+        negative_prompt= 'people',
+        number_of_images= 1,
+        include_rai_reason= True,
+        output_mime_type= 'image/jpeg'
+    )
+)
+  return response.generated_images[0].image;
+}
+
+
 
 // Start Server
 const PORT = 6000;
