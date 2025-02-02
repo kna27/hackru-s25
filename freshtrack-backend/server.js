@@ -42,8 +42,8 @@ app.get("/items", async (req, res) => {
 });
 
 app.post("/items", async (req, res) => {
-  const { name, days } = req.body;
-  const newItem = new Item({ name, days });
+  const { name, expiration } = req.body;
+  const newItem = new Item({ name, expiration });
   await newItem.save();
   res.json(newItem);
 });

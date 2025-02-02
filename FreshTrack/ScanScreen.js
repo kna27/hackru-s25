@@ -30,11 +30,8 @@ const ScanScreen = () => {
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       base64: true,
-      // For newer versions check for canceled property:
-      // quality: 1,
     });
     if (!result.canceled) {
-      // For expo SDK v48+ the image uri is in result.assets[0].uri
       const uri = result.assets ? result.assets[0].uri : result.uri;
       setImageFunction(uri);
       setError(null);
@@ -54,15 +51,37 @@ const ScanScreen = () => {
       const response = await fetch(`${API_URL}/${endpoint}`, {
         method: "POST",
         body: formData,
-        // Do not set "Content-Type" here – let fetch set it automatically when using FormData.
       });
-      
 
       const data = await response.json();
       setTextFunction(data.text || "No text detected");
     } catch (err) {
       console.error(err);
       setError("Failed to upload image");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitItem = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/items`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: productText,
+          expiration: expirationText,
+        }),
+      });
+
+      const data = await response.json();
+      Alert.alert("Item Saved", `Name: ${data.name}, Expiration: ${data.expiration}`);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to submit item");
     } finally {
       setLoading(false);
     }
@@ -85,7 +104,7 @@ const ScanScreen = () => {
         style={styles.textBox}
         value={productText}
         placeholder="Product Details"
-        editable={true} // Allow user to edit the detected text
+        editable={true}
         onChangeText={setProductText}
       />
 
@@ -104,12 +123,20 @@ const ScanScreen = () => {
         style={styles.textBox}
         value={expirationText}
         placeholder="Expiration Date"
-        editable={true} // Allow user to edit the detected text
+        editable={true}
         onChangeText={setExpirationText}
       />
 
       {loading && <ActivityIndicator size="large" color="#007AFF" />}
       {error && <Text style={styles.errorText}>{error}</Text>}
+
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={submitItem}
+        disabled={loading || !productText || !expirationText}
+      >
+        <Text style={styles.buttonText}>Submit Item</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -136,6 +163,12 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  submitButton: {
+    backgroundColor: "#34C759",
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 20,
   },
   imageContainer: {
     borderRadius: 8,
