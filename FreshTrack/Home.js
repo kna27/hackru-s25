@@ -66,6 +66,12 @@ const HomeScreen = () => {
     }
   };
 
+  const getItemStyle = (daysRemaining) => {
+    if (daysRemaining < 3) return styles.item3;
+    else if (daysRemaining < 6) return styles.item2;
+    return styles.item1;
+  };
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
@@ -77,7 +83,7 @@ const HomeScreen = () => {
             data={items}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
-              <View style={styles.item}>
+              <View style={[styles.item, getItemStyle(item.daysRemaining)]}>
                 <View style={styles.itemInfo}>
                   <Text style={styles.itemName}>{item.name}</Text>
                   <Text style={styles.itemDays}>
