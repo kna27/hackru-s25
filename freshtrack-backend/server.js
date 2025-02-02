@@ -6,6 +6,7 @@ const cors = require("cors");
 // GenAi
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API);
+const fileManager = new GoogleAIFileManager(process.env.GEMINI_API);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const app = express();
@@ -65,6 +66,55 @@ async function getExpiringIn(days) {
   future.setDate(future.getDate() + days);
   return await Item.find({ expiration: { $lte: future } });
 }
+
+async function getExpiration(imageURL){
+  const uploadResult = await fileManager.uploadFile(
+    imageURL,
+    {
+      mimeType: "image/jpeg",
+      displayName: "Expiration Image",
+    },
+  );
+
+  console.log(
+    `Uploaded file ${uploadResult.file.displayName} as: ${uploadResult.file.uri}`,
+  );
+
+  const result = await model.generateContent([
+    "What is the expiration date as seen in the image. Be careful, as the expiration date on the image may not be in standard mm/dd/yyyy format. Assume that the product has been purchaseed recently. In your response, only put the correct expiration date in the following format: yyyy-mm-dd",
+    {
+      fileData: {
+        fileUri: uploadResult.file.uri,
+        mimeType: uploadResult.file.mimeType,
+      },
+    },
+  ]);
+}
+
+async function getName(imageURL){
+  const uploadResult = await fileManager.uploadFile(
+    imageURL,
+    {
+      mimeType: "image/jpeg",
+      displayName: "Product Image",
+    },
+  );
+
+  console.log(
+    `Uploaded file ${uploadResult.file.displayName} as: ${uploadResult.file.uri}`,
+  );
+
+  const result = await model.generateContent([
+    "What is the name of the product in the uploaded file. Only return the name of the product as seen in the image. Write the name of the brand if visible as well. ",
+    {
+      fileData: {
+        fileUri: uploadResult.file.uri,
+        mimeType: uploadResult.file.mimeType,
+      },
+    },
+  ]);
+}
+
 
 async function generateRecipe(items){
   itemString = "";
