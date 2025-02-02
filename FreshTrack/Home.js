@@ -17,12 +17,28 @@ const HomeScreen = () => {
     try {
       const response = await fetch(API_URL);
       const data = await response.json();
-      setItems(data);
+
+      const processedData = data.map((item) => ({
+        ...item,
+        daysRemaining: calculateDaysRemaining(item.expiration),
+      }));
+
+      const sortedData = processedData.sort((a, b) => a.daysRemaining - b.daysRemaining);
+
+      setItems(sortedData);
       setLoading(false);
     } catch (error) {
       console.error('❌ Error fetching items:', error);
       setLoading(false);
     }
+  };
+
+  const calculateDaysRemaining = (expirationDate) => {
+    const today = new Date();
+    const expiryDate = new Date(expirationDate);
+    const timeDiff = expiryDate - today;
+    const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    return daysRemaining >= 0 ? daysRemaining : 0;
   };
 
   const deleteItem = async (id) => {
@@ -48,7 +64,11 @@ const HomeScreen = () => {
               <View style={styles.item}>
                 <View style={styles.itemInfo}>
                   <Text style={styles.itemName}>{item.name}</Text>
-                  <Text style={styles.itemDays}>Expires in {item.expiration} days</Text>
+                  <Text style={styles.itemDays}>
+                    {item.daysRemaining === 0
+                      ? 'Expired'
+                      : `Expires in ${item.daysRemaining} days`}
+                  </Text>
                 </View>
                 <TouchableOpacity onPress={() => deleteItem(item._id)}>
                   <Ionicons name="close-circle" size={24} color="#D32F2F" />
