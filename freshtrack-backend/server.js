@@ -84,14 +84,14 @@ async function getExpiringIn(days) {
   const now = new Date();
   const future = new Date(now);
   future.setDate(future.getDate() + days);
-  return await Item.find({ expiration: { $lte: future } });
+  return await Item.find({ expiration: { $gte: now, $lte: future } });
 }
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 const saveBufferToFile = (buffer, fileName) => {
-  const tempFilePath = path.join(__dirname, "uploads", fileName);
+  const tempFilePath = path.join(__dirname, "", fileName);
   fs.writeFileSync(tempFilePath, buffer);
   return tempFilePath;
 };
