@@ -1,13 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View, FlatList, TouchableOpacity, ActivityIndicator, SafeAreaView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import styles from './styles';
+import React, { useEffect, useState } from "react";
+import {
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  SafeAreaView,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import styles from "./styles";
+import { useFocusEffect } from "@react-navigation/native";
 
-const API_URL = 'http://localhost:6000/items';
+const API_URL = "http://localhost:6000/items";
 
 const HomeScreen = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchItems();
+    }, [])
+  );
 
   useEffect(() => {
     fetchItems();
@@ -23,12 +37,14 @@ const HomeScreen = () => {
         daysRemaining: calculateDaysRemaining(item.expiration),
       }));
 
-      const sortedData = processedData.sort((a, b) => a.daysRemaining - b.daysRemaining);
+      const sortedData = processedData.sort(
+        (a, b) => a.daysRemaining - b.daysRemaining
+      );
 
       setItems(sortedData);
       setLoading(false);
     } catch (error) {
-      console.error('❌ Error fetching items:', error);
+      console.error("❌ Error fetching items:", error);
       setLoading(false);
     }
   };
@@ -43,10 +59,10 @@ const HomeScreen = () => {
 
   const deleteItem = async (id) => {
     try {
-      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
       setItems(items.filter((item) => item._id !== id));
     } catch (error) {
-      console.error('❌ Error deleting item:', error);
+      console.error("❌ Error deleting item:", error);
     }
   };
 
@@ -66,7 +82,7 @@ const HomeScreen = () => {
                   <Text style={styles.itemName}>{item.name}</Text>
                   <Text style={styles.itemDays}>
                     {item.daysRemaining === 0
-                      ? 'Expired'
+                      ? "Expired"
                       : `Expires in ${item.daysRemaining} days`}
                   </Text>
                 </View>
